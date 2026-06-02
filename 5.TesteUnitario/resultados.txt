@@ -1,0 +1,52 @@
+# Resultados dos Testes Unitários
+
+Para o exercício de testes unitários, foi escolhida a classe `DQRSilver`, desenvolvida no exercício de Data Quality. 
+Essa classe foi selecionada por concentrar as principais regras de validação aplicadas à camada Silver da tabela de clientes.
+
+Os testes foram implementados utilizando a biblioteca `pytest`, com criação de DataFrames Spark controlados para validar o comportamento de cada regra de forma isolada.
+
+## Estratégia adotada
+
+Foi criado um teste para cada comportamento relevante da classe, contemplando:
+
+* a função auxiliar `adicionar_resultado`;
+* a validação de unicidade do cliente;
+* a validação de padrão de telefone;
+* a validação de data de atualização futura;
+* a validação de domínio do tipo de pessoa;
+* a validação de renda negativa;
+* a validação de data de nascimento futura;
+* a validação de nascimento posterior à data de atualização;
+* a validação de idade plausível.
+
+A abordagem utilizada priorizou testes pequenos, objetivos e com datasets mínimos, permitindo validar cada regra de negócio de forma independente.
+
+## Cenários cobertos
+
+Os testes contemplam situações de falha controlada, valores inválidos e casos de borda, como renda igual a zero, domínio inválido de tipo de pessoa, 
+datas futuras e idade acima do limite plausível.
+
+Essa estratégia permite verificar se cada método da classe identifica corretamente registros inválidos, 
+calcula o percentual de inconsistência e define o status da regra como `PASS` ou `FAIL`.
+
+## Execução
+
+Os testes foram executados com o seguinte comando:
+
+```bash
+python -m pytest 5_TesteUnitario/unit_test.py -v
+```
+
+## Resultado
+
+Todos os testes implementados foram executados com sucesso.
+
+Quantidade total de testes: 9
+Resultado: 9 passed
+
+## Conclusão
+
+A implementação dos testes unitários validou os principais comportamentos da classe `DQRSilver`, 
+garantindo maior confiabilidade às regras de qualidade de dados aplicadas sobre a camada Silver.
+
+A escolha por testar cada regra individualmente facilita a manutenção do código e permite identificar rapidamente qual validação foi impactada em caso de alteração futura.

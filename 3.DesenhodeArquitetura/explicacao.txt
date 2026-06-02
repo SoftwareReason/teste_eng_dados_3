@@ -1,0 +1,42 @@
+# Explicação da Arquitetura
+
+A arquitetura proposta tem como objetivo coletar dados de cadastro de clientes armazenados em um banco MySQL operacional e disponibilizá-los em um Data Lake na AWS, 
+seguindo o modelo de arquitetura medalhão. O processo contempla ingestão incremental por CDC, provisionamento de infraestrutura por código, processamento em múltiplas camadas, 
+catalogação dos dados e governança de acesso baseada em usuários e serviços.
+
+O banco MySQL representa a origem transacional dos dados, responsável por armazenar as operações do sistema de cadastro de clientes. 
+Para evitar cargas completas recorrentes e reduzir o impacto sobre o banco operacional, a ingestão será realizada por meio do AWS DMS utilizando CDC (Change Data Capture), 
+permitindo capturar apenas as alterações realizadas nos registros, como inserções, atualizações e exclusões.
+
+Os dados capturados pelo AWS DMS serão gravados inicialmente na camada Raw do Data Lake em Amazon S3. 
+Essa camada preserva os dados exatamente como foram recebidos da origem, garantindo rastreabilidade, auditoria, 
+histórico das informações e possibilidade de reprocessamento em caso de falhas ou necessidade de reconstrução das camadas posteriores.
+
+A infraestrutura necessária para a solução, incluindo buckets S3, políticas de acesso, roles IAM e AWS Glue Jobs, poderá ser provisionada por meio de Terraform, 
+garantindo padronização, rastreabilidade das alterações e facilidade de manutenção da arquitetura.
+
+A partir da camada Raw, serão executados processos de transformação utilizando AWS Glue Jobs. 
+Na camada Bronze, os dados recebem padronizações iniciais, como validação de schema, ajuste de tipos, 
+normalização de nomes de colunas, particionamento e organização física para consulta, 
+incluindo a conversão para formatos otimizados de armazenamento, como Parquet.
+
+Na camada Silver, são aplicadas regras mais robustas de tratamento e qualidade dos dados, 
+como deduplicação, validação de campos obrigatórios, tratamento de inconsistências, padronização de valores e aplicação de regras de negócio. 
+Essa camada representa uma visão mais confiável e estruturada dos dados de clientes.
+
+Na camada Gold, os dados são organizados para consumo analítico. E
+ssa camada pode conter tabelas agregadas, visões de negócio e datasets preparados para consultas analíticas, dashboards, relatórios e modelos de Machine Learning.
+
+As tabelas e partições geradas em cada camada serão registradas no AWS Glue Data Catalog, 
+permitindo que os dados armazenados no Amazon S3 sejam descobertos e consultados por serviços analíticos como Amazon Athena.
+
+O controle de acesso será realizado por meio de políticas IAM e roles específicas para usuários e serviços, 
+seguindo o princípio do menor privilégio. Dessa forma, cada consumidor terá acesso apenas aos recursos necessários para executar suas atividades, 
+garantindo segurança e governança sobre os dados armazenados no Data Lake.
+
+Por fim, usuários e serviços autorizados poderão consumir os dados da camada Gold por meio de ferramentas analíticas, 
+consultas utilizando Amazon Athena, plataformas de Business Intelligence e pipelines de Machine Learning, 
+sempre respeitando as permissões definidas pela governança da solução.
+
+Dessa forma, a arquitetura garante ingestão incremental, escalabilidade, rastreabilidade, separação clara entre camadas de tratamento, otimização para consultas analíticas, 
+reutilização dos dados por múltiplos consumidores e controle seguro de acesso às informações.

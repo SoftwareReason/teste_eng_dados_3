@@ -1,0 +1,107 @@
+ 2. Análise dos dados
+
+Utilize o arquivo `clientes_sinteticos.csv`.
+
+Descrição
+
+- Identifique os 5 clientes que mais sofreram atualizações na base.
+- Calcule a média de idade dos clientes.
+
+# ============================================================================
+PARTE 1 - Identifique os 5 clientes que mais sofreram atualizações na base.
+# ============================================================================
+
+Premissas
+
+    - A análise foi realizada utilizando a coluna cod_cliente como identificador principal, uma vez que este é o campo disponibilizado pelo dataset para representação da entidade cliente.
+
+    - Durante a exploração dos dados foram identificadas inconsistências relacionadas à unicidade da coluna cod_cliente. 
+      Foram encontrados registros com o mesmo código de cliente associados a nomes, telefones, datas de nascimento e demais atributos cadastrais distintos.
+
+    - Foram realizadas tentativas de validação e identificação de possíveis chaves alternativas por meio da análise de atributos como nome do cliente, telefone e data de nascimento. 
+      Embora algumas combinações tenham apresentado comportamento compatível com unicidade, não foi possível comprovar que tais campos representavam uma chave de negócio oficial ou uma relação histórica entre versões do mesmo cliente.
+
+    - Em razão dessas limitações, os resultados apresentados devem ser interpretados como uma análise baseada na estrutura disponibilizada pelo dataset e não como uma representação inequívoca do histórico cadastral de clientes reais.
+
+    - Considerou-se como atualização cadastral cada ocorrência adicional associada ao mesmo cod_cliente, assumindo que o primeiro registro representa a criação inicial do cadastro e os registros subsequentes representam eventos de atualização.
+
+1. Metodologia utilizada
+    Inicialmente, assumiu-se que a coluna cod_cliente representava o identificador da entidade cliente ao longo do histórico cadastral. 
+    Com base nessa premissa, os registros foram agrupados por cliente e ordenados pela quantidade de ocorrências identificadas na base.
+    Para construção do ranking, considerou-se que cada ocorrência adicional associada ao mesmo cod_cliente representa uma atualização cadastral, 
+    assumindo que o primeiro registro corresponde à criação inicial do cadastro e os registros subsequentes representam eventos de atualização.
+    Durante a apuração dos resultados foram identificados empates na quantidade de atualizações entre diferentes clientes. 
+    Para garantir reprodutibilidade e ordenação determinística dos resultados, foi utilizado o código do cliente como critério secundário de desempate.
+    Cabe destacar que a definição do critério de desempate não altera as quantidades apuradas, mas pode alterar a composição ou a ordem dos clientes apresentados nas últimas posições do ranking quando existem valores empatados.
+
+2. Resultado do exercício
+    +-----------+----------------+----------------+
+    |cod_cliente|nm_cliente      |qtd_atualizacoes|
+    +-----------+----------------+----------------+
+    |396        |DONALD WALKER   |4               |
+    |479        |JEFFREY ADAMS   |4               |
+    |878        |SHANNON VALENCIA|4               |
+    |855        |JAMES LEVINE    |3               |
+    |71         |ANTHONY GOODWIN |2               |
+    +-----------+----------------+----------------+
+
+3. Análise do exercício 1
+    Após a obtenção do ranking, foi realizada uma análise exploratória dos registros associados aos clientes com maior quantidade de atualizações. 
+    O objetivo inicial era compreender quais atributos haviam sido modificados ao longo do tempo e quais características poderiam justificar a recorrência observada.
+    Durante essa investigação, observou-se que registros associados ao mesmo cod_cliente apresentavam nomes, datas de nascimento, telefones, localidades e demais atributos cadastrais completamente distintos entre si. 
+    Esse comportamento chamou atenção por divergir do padrão normalmente esperado para uma chave de negócio de clientes.
+    Com o objetivo de validar essa observação, foram executadas análises complementares sobre a cardinalidade dos principais atributos da base. 
+    Verificou-se que o dataset possui 500 registros, 500 números de telefone distintos e apenas 397 valores distintos para cod_cliente, evidenciando que diferentes indivíduos compartilham o mesmo código identificador.
+    Também foram avaliadas possíveis alternativas para identificação unívoca dos registros. 
+    Observou-se que a coluna de telefone não apresenta duplicidades e que a combinação entre nome e data de nascimento também apresentou comportamento compatível com unicidade. 
+    Entretanto, não foi possível afirmar que tais atributos representassem uma chave de negócio oficial ou que permitissem reconstruir de forma segura o histórico de um mesmo cliente.
+    Essas evidências sugerem que o conjunto de dados sintético não preserva integralmente as características normalmente esperadas para um cadastro histórico de clientes. 
+    Em um ambiente produtivo, seria esperado que um identificador de cliente permanecesse associado ao mesmo indivíduo ao longo das diferentes versões de seu cadastro, sofrendo alterações apenas em atributos específicos.
+    Dessa forma, embora tenham sido identificadas limitações relacionadas à consistência do identificador utilizado, 
+    os resultados apresentados neste exercício foram mantidos com base na estrutura originalmente disponibilizada pelo dataset, respeitando as informações fornecidas pelo problema proposto.
+
+4. Códigos utilizados
+    nalise_de_dados.py - PARTE 1 - CLIENTES COM MAIOR QUANTIDADE DE ATUALIZAÇÕES
+
+
+# ============================================================================
+PARTE 2 - Calcule a média de idade dos clientes.
+# ============================================================================
+
+1. Metodologia utilizada
+    Para o cálculo da média de idade dos clientes foi utilizada a camada Silver construída no exercício anterior. 
+    A utilização dessa camada tem como objetivo trabalhar sobre uma visão consolidada dos dados, considerando apenas o registro mais recente disponível para cada cliente.
+    A idade foi calculada a partir da diferença entre a data atual de processamento e a data de nascimento de cada cliente, sendo o resultado convertido para anos completos. 
+    Após a criação da coluna de idade, foi aplicada uma agregação para obtenção da média de idade dos clientes presentes na base.
+    O resultado final foi arredondado para duas casas decimais para facilitar sua apresentação e interpretação.
+
+2. Resultado do exercício
+    +--------------------+
+    |media_idade_clientes|
+    +--------------------+
+    |51.58               |
+    +--------------------+
+
+3. Análise do exercício 1
+    A média de idade obtida fornece uma visão geral do perfil etário dos clientes presentes na base analisada. 
+    Como o cálculo foi realizado sobre a camada Silver, cada cliente contribui apenas uma vez para o resultado final, evitando que múltiplas versões de um mesmo cadastro influenciem desproporcionalmente a métrica.
+    Essa abordagem permite que a média represente de forma mais adequada a distribuição etária dos clientes disponíveis no conjunto de dados consolidado.
+    Por se tratar de uma medida agregada, a média não descreve integralmente a distribuição das idades presentes na base. 
+    Dessa forma, análises complementares utilizando mediana, percentis ou distribuição por faixas etárias poderiam fornecer uma visão mais detalhada da composição do público analisado.
+
+4. Códigos utilizados
+    analise_de_dados.py - PARTE 2 - MÉDIA DE IDADE DOS CLIENTES
+
+# ============================================================================
+Considerações finais
+# ============================================================================
+
+Além da resolução objetiva dos exercícios propostos, foi realizada uma etapa complementar de exploração dos dados durante a análise do primeiro exercício. 
+O objetivo dessa investigação foi validar as premissas adotadas, verificar a consistência dos identificadores disponíveis e avaliar a confiabilidade dos resultados obtidos. 
+Essa abordagem segue boas práticas de análise de dados, nas quais a compreensão e validação da fonte são etapas tão importantes quanto a construção das consultas e métricas.
+Para o segundo exercício, optou-se por seguir a abordagem esperada para um ambiente analítico convencional, utilizando a camada Silver construída anteriormente como visão consolidada dos clientes. 
+Dessa forma, a média de idade foi calculada considerando a estrutura disponibilizada pelo exercício e assumindo que a camada de dados utilizada representa adequadamente a entidade cliente, reproduzindo o fluxo normalmente adotado em ambientes corporativos de dados.
+
+
+
+
